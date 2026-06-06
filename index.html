@@ -268,8 +268,6 @@
     </div>
 
     <script>
-        if (window.gmod && window.gmod.EnableHUD) { window.gmod.EnableHUD(false); }
-        
         function openTab(tabId) {
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
@@ -296,11 +294,16 @@
             }
         }, 1000);
 
+        // Verbinden-Aktion
         button.addEventListener('click', function() {
-            if (window.gmod && window.gmod.OnLoadFinished) {
+            // Blendet das Overlay im Browser oder Ingame aus
+            document.querySelector('.popup-overlay').style.display = 'none';
+            
+            // Schließt das GMod-Fenster und schickt die Bestätigung an das Server-Lua-Skript
+            if (typeof neonCloseLadescreen === 'function') {
+                neonCloseLadescreen();
+            } else if (window.gmod && window.gmod.OnLoadFinished) {
                 window.gmod.OnLoadFinished();
-            } else {
-                document.querySelector('.popup-overlay').style.display = 'none';
             }
         });
     </script>
