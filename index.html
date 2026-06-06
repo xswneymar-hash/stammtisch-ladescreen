@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { 
+            width: 100%; height: 100%; overflow: hidden; 
+            background-color: #111; 
+            background-image: url('https://i.postimg.cc/L6t6JRH0/stammtisch-wallpaper.png');
+            background-size: cover; 
+            background-position: center;
+        }
+
+        /* Das Hauptfenster */
+        .popup-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            width: 600px; 
+            background: rgba(20, 20, 20, 0.85); 
+            backdrop-filter: blur(8px); 
+            border: 2px solid #ff4444; 
+            border-radius: 10px;
+            padding: 30px;
+            color: #fff;
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 { text-align: center; color: #ff4444; margin-bottom: 15px; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
+        h3 { color: #aaa; margin-top: 15px; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,68,68,0.3); padding-bottom: 3px;}
+        
+        /* Navigation Tabs */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 44, 44, 0.3);
+            color: #aaa;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 44, 44, 0.2);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: #ff4444;
+            color: #fff;
+            border-color: #ff4444;
+        }
+
+        /* Content Bereiche */
+        .tab-content {
+            display: none;
+            height: 280px; /* Feste Höhe, damit nichts mehr verrutscht */
+            overflow-y: auto; /* Aktiviert den Scrollbalken, wenn nötig */
+            padding-right: 5px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Schicker, custom Scrollbalken passend zum TTT-Design */
+        .tab-content::-webkit-scrollbar { width: 6px; }
+        .tab-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+        .tab-content::-webkit-scrollbar-thumb { background: #ff4444; border-radius: 10px; }
+
+        /* SEITE 1: Regeln-Styling */
+        ul { list-style-type: none; padding-left: 0; }
+        li { margin-bottom: 10px; font-size: 15px; line-height: 1.4; padding-left: 15px; border-left: 3px solid #ff4444; }
+        
+        .admin-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .admin-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #ff4444; object-fit: cover; }
+        .admin-info { display: flex; flex-direction: column; }
+        .admin-title { font-size: 11px; color: #ccc; text-transform: uppercase; }
+        .admin-name { color: #00ff00; font-weight: bold; font-size: 18px; }
+
+        /* SEITE 2: Stammtisch-Mitglieder Listen */
+        .members-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .member-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            width: calc(50% - 6px); /* 2 Spalten Layout */
+            padding: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #ff4444;
+        }
+
+        .founder-card {
+            border-left: 3px solid #ffcc00;
+        }
+
+        .member-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #333;
+        }
+
+        .member-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Der festsitzende Verbinden-Button ganz unten */
+        .join-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 25px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.3s, opacity 0.3s;
+            text-align: center;
+        }
+
+        .join-btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="popup-overlay">
+        <h1>Trouble in Stammtisch Town</h1>
+        
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="openTab('regeln')">Regeln & Admin</button>
+            <button class="tab-btn" onclick="openTab('stammtisch')">Der Stammtisch</button>
+        </div>
+
+        <div id="regeln" class="tab-content active">
+            <h3>Server-Regeln:</h3>
+            <ul>
+                <li>1. Kein RDM – Erst schießen, wenn du Beweise hast!</li>
+                <li>2. Schwören! Wer schwört ist automatisch vogelfrei!</li>
+                <li>3. Traitor-Fallen und -Buttons dürfen nicht abgecampt werden.</li>
+                <li>4. Wer das liest ist ein Hurensohn.</li>
+            </ul>
+
+            <div class="admin-box">
+                <img src="https://shared.akamai.steamstatic.com/community_assets/images/items/2322010/d78554748b7e6a1d5d027cc20b24e0aceb6881c2.gif" alt="Admin Avatar" class="admin-avatar">
+                <div class="admin-info">
+                    <span class="admin-title">Admin</span>
+                    <span class="admin-name">Anas</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="stammtisch" class="tab-content">
+            
+            <h3>Gründungsmitglieder</h3>
+            <div class="members-grid">
+                <div class="member-card founder-card">
+                    <img src="https://i.postimg.cc/W4V4zhQv/underwood.gif" class="member-avatar">
+                    <span class="member-name">Underwood</span>
+                </div>
+                <div class="member-card founder-card">
+                    <img src="https://i.postimg.cc/8P3Jpkp1/anas.png" class="member-avatar">
+                    <span class="member-name">Anas</span>
+                </div>
+                <div class="member-card founder-card">
+                    <img src="https://i.postimg.cc/fRcwGMkC/dustin.png" class="member-avatar">
+                    <span class="member-name">Dustin</span>
+                </div>
+                <div class="member-card founder-card">
+                    <img src="https://i.postimg.cc/Tw4GVwH3/furkan.png" class="member-avatar">
+                    <span class="member-name">Chuck Abi aka Florian aka Flo</span>
+                </div>
+                <div class="member-card founder-card">
+                    <img src="https://i.postimg.cc/VNsd4J4V/wizzly.png" class="member-avatar">
+                    <span class="member-name">Wizzly</span>
+                </div>
+                <div class="member-card founder-card">
+                    <img src="https://i.postimg.cc/3RVNKn75/moh.png" class="member-avatar">
+                    <span class="member-name">Moh</span>
+                </div>
+            </div>
+
+            <h3>Mitglieder</h3>
+            <div class="members-grid">
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/fRzzQ6XZ/merfin.png" class="member-avatar">
+                    <span class="member-name">Merfin aka ZitronenSaft</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/rmrc9c6C/Gucci.png" class="member-avatar">
+                    <span class="member-name">Gucci</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/TY9x0Css/price.png" class="member-avatar">
+                    <span class="member-name">Price</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/prJw0Lsp/prestige.png" class="member-avatar">
+                    <span class="member-name">Prestige</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/NfphmLyP/johannes.png" class="member-avatar">
+                    <span class="member-name">Johannes</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/cC0j8NdG/polat.gif" class="member-avatar">
+                    <span class="member-name">Polat</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/RCL2xqTc/surprise.png" class="member-avatar">
+                    <span class="member-name">SURPRISE</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/VkdhtgPD/p3zi.png" class="member-avatar">
+                    <span class="member-name">P3zi</span>
+                </div>
+                <div class="member-card">
+                    <img src="https://i.postimg.cc/bw7mtjTZ/tingeljack.gif" class="member-avatar">
+                    <span class="member-name">TingelJack</span>
+                </div>
+            </div>
+        </div>
+
+        <button id="joinButton" class="join-btn" disabled>Bitte warten (25s)...</button>
+    </div>
+
+    <script>
+        function openTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // KÜNSTLICHER TIMER (25 Sekunden)
+        let timeLeft = 25; 
+        const button = document.getElementById('joinButton');
+
+        const timer = setInterval(function() {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                button.innerText = "Jetzt Beitreten";
+                button.disabled = false;
+            } else {
+                button.innerText = "Bitte warten (" + timeLeft + "s)...";
+            }
+        }, 1000);
+
+        button.addEventListener('click', function() {
+            if (window.gmod && window.gmod.OnLoadFinished) {
+                window.gmod.OnLoadFinished();
+            } else {
+                document.querySelector('.popup-overlay').style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>
