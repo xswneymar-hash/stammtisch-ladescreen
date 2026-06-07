@@ -268,7 +268,7 @@
             </div>
         </div>
 
-        <button id="joinButton" class="join-btn" disabled>Bitte warten (10s)...</button>
+        <button id="joinButton" class="join-btn" disabled>Bitte warten (3s)...</button>
     </div>
 
     <script>
@@ -283,8 +283,8 @@
             event.currentTarget.classList.add('active');
         }
 
-        // KÜNSTLICHER TIMER (25 Sekunden)
-        let timeLeft = 10; 
+        // KÜNSTLICHER TIMER (3 Sekunden)
+        let timeLeft = 3; 
         const button = document.getElementById('joinButton');
 
         const timer = setInterval(function() {
